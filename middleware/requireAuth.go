@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	// "DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/models"
+	"DoodleDropsBackend/traits"
 	"fmt"
 	"net/http"
 	"os"
@@ -36,7 +38,8 @@ func RequireAuth(c *gin.Context) {
 	})
 	if err != nil {
 		// c.AbortWithStatus(http.StatusUnauthorized)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		// c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		traits.PromptUnauthorized(c, "Invalid token")
 		c.Abort()
 		return
 	}

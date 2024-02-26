@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	// "DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/models"
+	"DoodleDropsBackend/traits"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -31,6 +34,7 @@ func Signup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to hash password"})
 		return
 	}
+
 	//Create the user
 	user := models.User{Email: body.Email, Password: string(hash)}
 	result := initializers.DB.Create(&user)
@@ -39,9 +43,32 @@ func Signup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create user"})
 		return
 	}
-	//respond
 
-	c.JSON(http.StatusOK, gin.H{})
+	userProfile := models.UserProfile{}
+
+	userProfile.UserId = user.ID
+
+	profileResult := initializers.DB.Create(&userProfile)
+
+	if profileResult.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create user ", "message": profileResult.Error})
+		return
+	}
+
+	type userStruct struct {
+		// Id    uint
+		Email string
+	}
+
+	userResponse := userStruct{
+		// Id:    user.ID,
+		Email: user.Email,
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":    userResponse,
+		"message": "User Created Successfully",
+	})
 }
 
 func Login(c *gin.Context) {
@@ -84,14 +111,44 @@ func Login(c *gin.Context) {
 	}
 	//set cookie
 	c.SetSameSite(http.SameSiteLaxMode)
-	// c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", true, false)
+
+	// type userStruct struct {
+	// 	Id    uint
+	// 	Email string
+	// }
+
+	// userResponse := userStruct{
+	// 	Id:    user.ID,
+	// 	Email: user.Email,
+	// }
 
 	//send it back
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully Logged In", "token": tokenString})
 }
 
 func Validate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "I am logged in",
+		"message": "User is current logged in",
 	})
+}
+
+func GetCurrentUser(c *gin.Context) {
+	// Get the current logged-in user from the context
+	user, exists := traits.CheckIfUserExists(c)
+
+	if !exists {
+		traits.PromptUnauthorized(c, "User not found!")
+		return
+	}
+	// Convert the interface to models.User
+	currentUser, ok := user.(models.User)
+	if !ok {
+		traits.PromptUnauthorized(c, "Invalid User Type")
+		return
+	}
+	if err := initializers.DB.Preload("UserProfile").Where("id = ?", currentUser.ID).First(&currentUser).Error; err != nil {
+		fmt.Println("Error preloading user profile", err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user": currentUser})
 }
