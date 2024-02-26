@@ -1,11 +1,14 @@
 package main
 
 import (
-	"DoodleDropsBackend/controllers"
 	"DoodleDropsBackend/initializers"
-	"DoodleDropsBackend/middleware"
+	"DoodleDropsBackend/routes"
+	"fmt"
+)
 
-	"github.com/gin-gonic/gin"
+const (
+	host = "0.0.0.0"
+	port = 8000
 )
 
 func init() {
@@ -15,9 +18,9 @@ func init() {
 }
 
 func main() {
-	r := gin.Default()
-	r.GET("/api/validate", middleware.RequireAuth, controllers.Validate)
-	r.POST("/api/signup", controllers.Signup)
-	r.POST("/api/login", controllers.Login)
-	r.Run()
+	routes := routes.NewRoutes()
+
+	routes.SetupRoutes()
+	address := fmt.Sprintf("%s:%d", host, port)
+	routes.Run(address)
 }

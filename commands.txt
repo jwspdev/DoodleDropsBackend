@@ -1,0 +1,2 @@
+execute compile daemon
+CompileDaemon -command="./DoodleDropsBackend"
