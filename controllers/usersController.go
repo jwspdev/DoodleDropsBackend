@@ -112,16 +112,6 @@ func Login(c *gin.Context) {
 	//set cookie
 	c.SetSameSite(http.SameSiteLaxMode)
 
-	// type userStruct struct {
-	// 	Id    uint
-	// 	Email string
-	// }
-
-	// userResponse := userStruct{
-	// 	Id:    user.ID,
-	// 	Email: user.Email,
-	// }
-
 	//send it back
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully Logged In", "token": tokenString})
 }
