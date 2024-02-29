@@ -19,10 +19,11 @@ func NewRoutes() *Routes {
 
 func (r *Routes) SetupRoutes() {
 	r.Router.GET("/api/validate", middleware.RequireAuth, controllers.Validate)
-	r.Router.GET("/api/user/get", middleware.RequireAuth, controllers.GetCurrentUser)
+	r.Router.GET("/api/user/get/current", middleware.RequireAuth, controllers.GetCurrentUser)
 	r.Router.POST("/api/user/signup", controllers.Signup)
 	r.Router.POST("/api/user/login", controllers.Login)
 
+	r.Router.POST("/api/user/profile/update", middleware.RequireAuth, controllers.UpdateUserProfile)
 }
 
 func (r *Routes) Run() {
