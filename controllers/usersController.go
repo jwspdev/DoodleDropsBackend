@@ -18,8 +18,9 @@ import (
 func Signup(c *gin.Context) {
 	//Get the email and password
 	var body struct {
-		Email    string
-		Password string
+		Email       string
+		Password    string
+		DisplayName string
 	}
 
 	if c.Bind(&body) != nil {
@@ -44,7 +45,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	userProfile := models.UserProfile{}
+	userProfile := models.UserProfile{DisplayName: &body.DisplayName}
 
 	userProfile.UserId = user.ID
 

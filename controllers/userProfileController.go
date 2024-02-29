@@ -43,6 +43,9 @@ func UpdateUserProfile(c *gin.Context) {
 		return
 	}
 	userProfile := currentUser.UserProfile
+	if err := initializers.DB.Preload("User").Where("id = ?", userProfile.ID).First(&userProfile).Error; err != nil {
+		fmt.Println("Error preloading user profile", err)
+	}
 	if userProfile == nil {
 		userProfile = &models.UserProfile{UserId: currentUser.ID}
 		err := initializers.DB.Create(userProfile).Error
