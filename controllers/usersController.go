@@ -4,6 +4,7 @@ import (
 	// "DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/models"
+	"DoodleDropsBackend/responses"
 	"DoodleDropsBackend/traits"
 	"fmt"
 	"net/http"
@@ -141,5 +142,23 @@ func GetCurrentUser(c *gin.Context) {
 		fmt.Println("Error preloading user profile", err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"user": currentUser})
+	userResponse := responses.UserResponse{
+		ID:        currentUser.ID,
+		CreatedAt: currentUser.CreatedAt,
+		UpdatedAt: currentUser.UpdatedAt,
+		Email:     currentUser.Email,
+		UserProfile: responses.UserProfileResponse{
+			ID:          currentUser.UserProfile.ID,
+			CreatedAt:   currentUser.UserProfile.CreatedAt,
+			UpdatedAt:   currentUser.UserProfile.UpdatedAt,
+			DisplayName: currentUser.UserProfile.DisplayName,
+			FirstName:   currentUser.UserProfile.FirstName,
+			MiddleName:  currentUser.UserProfile.MiddleName,
+			LastName:    currentUser.UserProfile.LastName,
+			Age:         currentUser.UserProfile.Age,
+			Birthday:    currentUser.UserProfile.Birthday,
+			UserID:      &currentUser.UserProfile.UserId,
+		},
+	}
+	c.JSON(http.StatusOK, gin.H{"user": userResponse})
 }
