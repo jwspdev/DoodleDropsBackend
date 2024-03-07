@@ -3,6 +3,7 @@ package controllers
 import (
 	"DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/models"
+	"DoodleDropsBackend/responses"
 	"DoodleDropsBackend/traits"
 	"fmt"
 	"net/http"
@@ -86,7 +87,17 @@ func UpdateUserProfile(c *gin.Context) {
 			"Error": err,
 		})
 	}
+	userResponse := responses.UserProfileResponse{
+		UpdatedAt:   currentUser.UserProfile.UpdatedAt,
+		DisplayName: currentUser.UserProfile.DisplayName,
+		FirstName:   currentUser.UserProfile.FirstName,
+		MiddleName:  currentUser.UserProfile.MiddleName,
+		LastName:    currentUser.UserProfile.LastName,
+		Age:         currentUser.UserProfile.Age,
+		Birthday:    currentUser.UserProfile.Birthday,
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"request_body": userProfile,
+		"message": "user updated successfully",
+		"data":    userResponse,
 	})
 }
