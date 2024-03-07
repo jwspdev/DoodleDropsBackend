@@ -13,7 +13,9 @@ func ConnectToDb() {
 	var err error
 	//make sure to change the values based on your db's credentials
 	dsn := os.Getenv("DB")
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 
 	if err != nil {
 		panic("Failed to connect to db")
