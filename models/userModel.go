@@ -9,4 +9,8 @@ type User struct {
 	// Test     string
 	Password    string
 	UserProfile *UserProfile
+	Posts       []*Post    `gorm:"foreignKey:AuthorID"`
+	Comments    []*Comment `gorm:"foreignKey:AuthorID"`
+	LikedPosts  []*Post    `gorm:"many2many:user_liked_posts"`
+	LikedTags   []*Tag     `gorm:"many2many:user_liked_tags"`
 }
