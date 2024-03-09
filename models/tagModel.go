@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"DoodleDropsBackend/traits"
+
+	"gorm.io/gorm"
+)
 
 type Tag struct {
 	gorm.Model
@@ -11,4 +15,9 @@ type Tag struct {
 	Description string
 	LikedBy     []*User `gorm:"many2many:user_liked_tags"`
 	//many to many
+}
+
+func (p *Tag) PaginatedResult(db *gorm.DB, paginate *traits.Paginate) *gorm.DB {
+	offset := (paginate.Page - 1) * paginate.Limit
+	return db.Offset(offset).Limit(paginate.Limit)
 }
