@@ -10,7 +10,7 @@ type Comment struct {
 	PostId   *uint64
 	Post     *Post
 	Content  string
-	ParentID *uint64
-	// Parent   *Comment `gorm:"foreignkey:ParentID"`
+	// ParentID *uint64
+	// Parent   *Comment `gorm:"foreignKey:ParentID"`
 	// Replies  []*Comment
 }
