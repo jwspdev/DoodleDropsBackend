@@ -27,4 +27,5 @@ func SyncDatabase() {
 
 	//MANUALLY ALTER TABLES (USED FOR TESTING IF MIGRATION IS PROPER)
 	// DB.Exec("ALTER TABLE users DROP COLUMN profile_refer").Exec("ALTER TABLE users DROP COLUMN test")
+	// DB.Exec("ALTER TABLE user_liked_tags DROP COLUMN post_id")
 }
