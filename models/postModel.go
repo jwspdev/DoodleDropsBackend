@@ -1,6 +1,8 @@
 package models
 
 import (
+	"DoodleDropsBackend/traits"
+
 	"gorm.io/gorm"
 )
 
@@ -14,4 +16,9 @@ type Post struct {
 	Description string
 	Tags        []*Tag `gorm:"many2many:post_tags"`
 	Comments    []*Comment
+}
+
+func (p *Post) PaginatedResult(db *gorm.DB, paginate *traits.Paginate) *gorm.DB {
+	offset := (paginate.Page - 1) * paginate.Limit
+	return db.Offset(offset).Limit(paginate.Limit)
 }
