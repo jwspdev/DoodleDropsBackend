@@ -15,13 +15,14 @@ func init() {
 
 func main() {
 	r := gin.Default()
-	// Create an instance of Routes
+
 	routes := routes.NewRoutes()
 
 	// Setup routes
 	routes.SetupRoutes()
 
-	// Run the Gin server
+	//Run routes
 	routes.Run()
+	// Run the Gin server
 	r.Run()
 }
