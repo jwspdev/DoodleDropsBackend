@@ -1,5 +1,6 @@
 package requests
 
 type CreatePostRequest struct {
-	Description string
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
