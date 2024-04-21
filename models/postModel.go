@@ -13,6 +13,7 @@ type Post struct {
 	AuthorID    uint64
 	Author      User
 	LikedBy     []*User `gorm:"many2many:user_liked_posts"`
+	Title       string
 	Description string
 	Tags        []*Tag `gorm:"many2many:post_tags"`
 	Comments    []*Comment
