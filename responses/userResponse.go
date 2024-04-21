@@ -9,4 +9,5 @@ type UserResponse struct {
 	// DeletedAt   *time.Time          `json:"deleted_at"`
 	Email       string              `json:"email"`
 	UserProfile UserProfileResponse `json:"user_profile"`
+	LikedTags   []TagsResponse      `json:"liked_tags"`
 }
