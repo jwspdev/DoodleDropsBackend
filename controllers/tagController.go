@@ -4,6 +4,7 @@ import (
 	"DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/models"
 	"DoodleDropsBackend/requests"
+	"DoodleDropsBackend/responses"
 	"DoodleDropsBackend/traits"
 	"net/http"
 
@@ -37,12 +38,29 @@ func ListTags(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"page":      requestBody.PageNumber,
-		"pageSize":  requestBody.Limit,
-		"totalTags": len(tags),
-		"tags":      tags,
-	})
+	var tagsResponse []responses.TagsResponse
+	for _, tag := range tags {
+		tagsResponse = append(tagsResponse, responses.TagsResponse{
+			ID:          tag.ID,
+			Name:        tag.Name,
+			Description: tag.Description,
+			TagType:     tag.TagType,
+		})
+	}
+
+	response := struct {
+		Page      int                      `json:"page"`
+		PageSize  int                      `json:"page_size"`
+		TotalTags int                      `json:"total_tags"`
+		Tags      []responses.TagsResponse `json:"tags"`
+	}{
+		Page:      requestBody.PageNumber,
+		PageSize:  requestBody.Limit,
+		TotalTags: len(tags),
+		Tags:      tagsResponse,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func AddTagToPost(c *gin.Context) {
@@ -127,12 +145,15 @@ func AddTagToPost(c *gin.Context) {
 		}
 	}
 	tx.Commit()
-	c.JSON(http.StatusOK, gin.H{
-		"tag_ids": newTagIDs,
-		"tags":    tags,
-		"user":    currentUser,
-		"post":    post,
-	})
+	if insertedTags > 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Tags added successfully",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "No Tags Added",
+		})
+	}
 }
 
 func LikeTag(c *gin.Context) {

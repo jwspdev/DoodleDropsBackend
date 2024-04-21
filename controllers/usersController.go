@@ -138,8 +138,10 @@ func GetCurrentUser(c *gin.Context) {
 		traits.PromptUnauthorized(c, "Invalid User Type")
 		return
 	}
-	if err := initializers.DB.Preload("UserProfile").Where("id = ?", currentUser.ID).First(&currentUser).Error; err != nil {
-		fmt.Println("Error preloading user profile", err)
+	if err := initializers.DB.Preload("UserProfile").
+		Preload("LikedTags").
+		Where("id = ?", currentUser.ID).First(&currentUser).Error; err != nil {
+		fmt.Println("Error data", err)
 	}
 
 	userResponse := responses.UserResponse{
@@ -159,6 +161,19 @@ func GetCurrentUser(c *gin.Context) {
 			Birthday:    currentUser.UserProfile.Birthday,
 			UserID:      &currentUser.UserProfile.UserId,
 		},
+		LikedTags: make([]responses.TagsResponse, len(currentUser.LikedTags)),
 	}
-	c.JSON(http.StatusOK, gin.H{"user": userResponse})
+	for i, tag := range currentUser.LikedTags {
+		userResponse.LikedTags[i] = responses.TagsResponse{
+			ID:          tag.ID,
+			Name:        tag.Name,
+			Description: tag.Description,
+			TagType:     tag.TagType,
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"user": userResponse,
+	})
 }
+
+//get user's posts

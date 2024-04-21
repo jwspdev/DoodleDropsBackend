@@ -4,6 +4,7 @@ import (
 	"DoodleDropsBackend/initializers"
 	"DoodleDropsBackend/models"
 	"DoodleDropsBackend/requests"
+	"DoodleDropsBackend/responses"
 	"DoodleDropsBackend/traits"
 	"net/http"
 
@@ -93,5 +94,55 @@ func DeleteComment(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Post Deleted Successfully",
+	})
+}
+
+func GetPostComments(c *gin.Context) {
+	var comments []models.Comment
+	var requestBody struct {
+		PostID          *uint64                  `json:"post_id"`
+		PaginateRequest requests.PaginateRequest `json:"paginate_request"`
+	}
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if requestBody.PaginateRequest.Limit < 1 {
+		requestBody.PaginateRequest.Limit = 5
+	}
+
+	if requestBody.PaginateRequest.PageNumber < 1 {
+		requestBody.PaginateRequest.PageNumber = 1
+	}
+	paginate := &traits.Paginate{Limit: requestBody.PaginateRequest.Limit, Page: requestBody.PaginateRequest.PageNumber}
+
+	db := initializers.DB.Model(&models.Comment{})
+	db.Preload("Author.UserProfile").Omit("Author")
+	db.Where("post_id = ?", &requestBody.PostID)
+
+	if err := paginate.PagintedResult(db).Find(&comments).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch comments"})
+		return
+	}
+
+	var commentResponses []responses.CommentResponse
+
+	for _, comment := range comments {
+		commentResponses = append(commentResponses, responses.CommentResponse{
+			ID:        comment.ID,
+			CreatedAt: comment.CreatedAt,
+			Content:   comment.Content,
+			CreatedBy: responses.CreatedByResponse{
+				UserID:      comment.AuthorID,
+				DisplayName: *comment.Author.UserProfile.DisplayName,
+			},
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"page":           requestBody.PaginateRequest.PageNumber,
+		"page_size":      requestBody.PaginateRequest.Limit,
+		"total_comments": len(comments),
+		"comments":       commentResponses,
 	})
 }
